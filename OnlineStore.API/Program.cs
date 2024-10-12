@@ -20,7 +20,7 @@ namespace OnlineStore.API
 
 			var app = builder.Build();
 
-			#region Configure the HTTP request pipeline. [Middleware]
+			#region Configure the HTTP request pipeline [Middleware]. 
 
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
