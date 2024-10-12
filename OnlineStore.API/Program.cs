@@ -6,7 +6,7 @@ namespace OnlineStore.API
 {
 	public class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 			
@@ -26,6 +26,27 @@ namespace OnlineStore.API
 			#endregion
 
 			var app = builder.Build();
+
+			#region Update-Database (With Run If we have New Migrations)
+			using var Scope = app.Services.CreateScope(); 
+			// Group Of Services Lifetime Scopped
+
+			var Services = Scope.ServiceProvider;
+			// Services it Self
+			try
+			{
+				var DbContext = Services.GetRequiredService<OnlineStoreDbContext>();
+				// Ask CLR For Creating Object form DbContext Explicitly
+
+				await DbContext.Database.MigrateAsync(); // Apply pending migrations
+			}
+			catch (Exception ex)
+			{
+				var logger = Services.GetRequiredService<ILogger<Program>>();
+				logger.LogError(ex, "An error occurred during migration");
+			}
+			
+			#endregion
 
 			#region Configure the HTTP request pipeline [Middleware]. 
 
