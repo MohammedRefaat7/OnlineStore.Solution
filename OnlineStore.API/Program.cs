@@ -33,6 +33,8 @@ namespace OnlineStore.API
 
 			var Services = Scope.ServiceProvider;
 			// Services it Self
+
+			var LoggerFactory = Services.GetRequiredService<ILoggerFactory>();
 			try
 			{
 				var DbContext = Services.GetRequiredService<OnlineStoreDbContext>();
@@ -42,8 +44,9 @@ namespace OnlineStore.API
 			}
 			catch (Exception ex)
 			{
-				var logger = Services.GetRequiredService<ILogger<Program>>();
-				logger.LogError(ex, "An error occurred during migration");
+				//var logger = Services.GetRequiredService<ILogger<Program>>();
+				var logger = LoggerFactory.CreateLogger<Program>();
+				logger.LogError(ex, "An Error Occurred during Migration");
 			}
 			
 			#endregion
