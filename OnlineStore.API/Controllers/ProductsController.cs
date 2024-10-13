@@ -14,7 +14,14 @@ namespace OnlineStore.API.Controllers
         {
 			_ProductRepo = ProductRepo;
 		}
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+		{
+			var Products = await _ProductRepo.GetAllAsync();
 
-
+			//OkObjectResult result = new OkObjectResult(Products);
+			//return result;
+			return Ok(Products);
+		}
     }
 }
