@@ -41,6 +41,9 @@ namespace OnlineStore.API
 				// Ask CLR For Creating Object form DbContext Explicitly
 
 				await DbContext.Database.MigrateAsync(); // Apply pending migrations
+
+				await OnlineStoreContextSeed.SeedAsync(DbContext);
+				// Execute only in The Initial Setup of an Application
 			}
 			catch (Exception ex)
 			{
