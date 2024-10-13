@@ -1,5 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
+using OnlineStore.Core.IRepositories;
+using OnlineStore.Core.Models;
+using OnlineStore.Repository;
 using OnlineStore.Repository.Data;
 
 namespace OnlineStore.API
@@ -22,6 +25,10 @@ namespace OnlineStore.API
 			{
 				options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 			});
+
+			//builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+			//builder.Services.AddScoped<IGenericRepository<ProductBrand>, GenericRepository<ProductBrand>>();
+			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 			#endregion
 
