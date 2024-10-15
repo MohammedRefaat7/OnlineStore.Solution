@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using OnlineStore.API.Helpers;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Repository;
@@ -30,6 +31,8 @@ namespace OnlineStore.API
 			//builder.Services.AddScoped<IGenericRepository<ProductBrand>, GenericRepository<ProductBrand>>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+			// builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfiles() ));
+			builder.Services.AddAutoMapper(typeof(MappingProfiles));
 			#endregion
 
 			var app = builder.Build();
