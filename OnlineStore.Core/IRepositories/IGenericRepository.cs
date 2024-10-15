@@ -1,4 +1,5 @@
 ﻿using OnlineStore.Core.Models;
+using OnlineStore.Core.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,8 @@ namespace OnlineStore.Core.IRepositories
 	{
 		Task<IEnumerable<T>> GetAllAsync();
 		Task<T> GetByIdAsync(int id);
+
+		Task<IEnumerable<T>> GetAllAsync(ISpecification<T> Specs);
+		Task<T> GetByIdAsync(ISpecification<T> Specs);
 	}
 }
