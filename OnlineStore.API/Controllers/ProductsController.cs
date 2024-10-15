@@ -29,7 +29,8 @@ namespace OnlineStore.API.Controllers
 		[HttpGet("{id}")]
 		public async Task<ActionResult<Product>> GetProduct(int id)
 		{
-			var Product = await _ProductRepo.GetByIdAsync(id);
+			var specs = new ProductWithTypeAndBrandSpecs(id);
+			var Product = await _ProductRepo.GetByIdAsync(specs);
 			return Ok(Product);
 		}
     }

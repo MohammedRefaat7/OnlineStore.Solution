@@ -14,5 +14,10 @@ namespace OnlineStore.Core.Specifications
             Includes.Add(P => P.ProductType);
             Includes.Add(P => P.ProductBrand);
         }
+        public ProductWithTypeAndBrandSpecs(int id) : base(p => p.Id == id) 
+        {
+			Includes.Add(P => P.ProductType);
+			Includes.Add(P => P.ProductBrand);
+		}
     }
 }
