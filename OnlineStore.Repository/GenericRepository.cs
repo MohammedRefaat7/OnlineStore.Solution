@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
+using OnlineStore.Core.Specifications;
 using OnlineStore.Repository.Data;
 using System;
 using System.Collections.Generic;
@@ -20,17 +21,32 @@ namespace OnlineStore.Repository
 		}
         public async Task<IEnumerable<T>> GetAllAsync()
 		{
-			if(typeof(T) == typeof(Product))
-			{
-				return (IEnumerable<T>) await _dbContext.Products.Include(p => p.ProductBrand).Include(p => p.ProductType).ToListAsync();
-			}
-			else
-			    return await _dbContext.Set<T>().ToListAsync();
+			//if(typeof(T) == typeof(Product))
+			//{
+			//	return (IEnumerable<T>) await _dbContext.Products.Include(p => p.ProductBrand).Include(p => p.ProductType).ToListAsync();
+			//}
+			//else
+		    return await _dbContext.Set<T>().ToListAsync();
 		}
 
 		public async Task<T> GetByIdAsync(int id)
 		{
 			return await _dbContext.Set<T>().FindAsync(id);
+		}
+
+		public async Task<IEnumerable<T>> GetAllAsync(ISpecification<T> Specs)
+		{
+			return await ApplySpecification(Specs).ToListAsync();
+		}
+
+		public async Task<T> GetByIdAsync(ISpecification<T> Specs)
+		{
+			return await ApplySpecification(Specs).FirstOrDefaultAsync();
+		}
+
+		private IQueryable<T> ApplySpecification(ISpecification<T> Specs)
+		{
+			return SpecificationEvalutor<T>.BuildQuery(_dbContext.Set<T>(), Specs);
 		}
 	}
 }
