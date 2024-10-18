@@ -1,5 +1,8 @@
 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
+using OnlineStore.API.Errors;
 using OnlineStore.API.Helpers;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
@@ -33,6 +36,24 @@ namespace OnlineStore.API
 
 			// builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfiles() ));
 			builder.Services.AddAutoMapper(typeof(MappingProfiles));
+
+			builder.Services.Configure<ApiBehaviorOptions>(Options =>
+			{
+				// BehaviorOfModelStateResponseFactory
+				Options.InvalidModelStateResponseFactory = (ActionContext) =>
+				{
+					var Errors = ActionContext.ModelState.Where(p => p.Value.Errors.Count()>0)
+					                                     .SelectMany(p => p.Value.Errors)
+														 .Select(E => E.ErrorMessage)
+														 .ToList();
+
+					var ApiValidationError = new ApiValidationErrorResponse()
+					{
+						Errors = Errors 
+					};
+					return new BadRequestObjectResult(ApiValidationError);
+				};
+			});
 			#endregion
 
 			var app = builder.Build();
