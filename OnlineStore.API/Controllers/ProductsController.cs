@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
+using OnlineStore.API.Errors;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Core.Specifications;
@@ -36,6 +37,8 @@ namespace OnlineStore.API.Controllers
 		{
 			var specs = new ProductWithTypeAndBrandSpecs(id);
 			var Product = await _ProductRepo.GetByIdAsync(specs);
+			if (Product is null) return NotFound(new ApiErrorResponse(404));
+
 			//Mapping
 			var MappedProduct = _Mapper.Map<Product, ProductToReturnDTO>(Product);	
 
