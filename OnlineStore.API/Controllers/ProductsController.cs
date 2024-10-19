@@ -38,7 +38,7 @@ namespace OnlineStore.API.Controllers
 
 		[HttpGet("{id}")]
 		[ProducesResponseType(typeof(ProductToReturnDTO) , StatusCodes.Status200OK)]
-		[ProducesResponseType(typeof(ApiErrorResponse) , StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(ApiErrorResponse) , 404)] //StatusCodes.Status404NotFound (StatusCodeEnum)
 		public async Task<ActionResult<Product>> GetProduct(int id)
 		{
 			var specs = new ProductWithTypeAndBrandSpecs(id);
