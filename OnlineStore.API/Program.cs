@@ -89,19 +89,21 @@ namespace OnlineStore.API
 			#region Configure the HTTP request pipeline [Middleware]. 
 
 			// Configure the HTTP request pipeline.
+			app.UseMiddleware<ExceptionMiddleware>();
 			if (app.Environment.IsDevelopment())
 			{
-				app.UseMiddleware<ExceptionMiddleware>();
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+			// app.UseStatusCodePagesWithRedirects("errors/{0}");   //2 Request
+			app.UseStatusCodePagesWithReExecute("/errors/{0}");      // 1 Request
 			app.UseStaticFiles();
 			app.UseHttpsRedirection();
 
 			app.UseAuthorization();
 
 
-			app.MapControllers();
+			app.MapControllers(); 
 
 			#endregion
 
