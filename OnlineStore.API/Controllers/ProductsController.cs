@@ -25,10 +25,12 @@ namespace OnlineStore.API.Controllers
 		{
 			var spec = new ProductWithTypeAndBrandSpecs();
 			var Products = await _ProductRepo.GetAllAsync(spec);
+
 			//Mapping
 			var MappedProducts = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductToReturnDTO>>(Products);
 			//OkObjectResult result = new OkObjectResult(Products);
 			//return result;
+			
 			return Ok(MappedProducts);
 		}
 
@@ -40,9 +42,30 @@ namespace OnlineStore.API.Controllers
 			if (Product is null) return NotFound(new ApiErrorResponse(404));
 
 			//Mapping
-			var MappedProduct = _Mapper.Map<Product, ProductToReturnDTO>(Product);	
+			var MappedProduct = _Mapper.Map<Product, ProductToReturnDTO>(Product);
+
+			
 
 			return Ok(MappedProduct);
 		}
-    }
+
+		#region Check API Exception Response (ServerError)
+
+		//[HttpGet("GetServerError")]
+		//public async Task<ActionResult<Product>> GetserverError()
+		//{
+		//	var specs = new ProductWithTypeAndBrandSpecs(100);
+		//	var Product = await _ProductRepo.GetByIdAsync(specs);
+
+
+		//	//Mapping
+		//	var MappedProduct = _Mapper.Map<Product, ProductToReturnDTO>(Product);
+
+		//	var er = MappedProduct.ToString();
+
+		//	return Ok(er);
+		//}
+
+		#endregion
+	}
 }

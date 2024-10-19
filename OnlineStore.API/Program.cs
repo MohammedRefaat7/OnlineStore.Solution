@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.API.Errors;
 using OnlineStore.API.Helpers;
+using OnlineStore.API.Middlewares;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Repository;
@@ -90,6 +91,7 @@ namespace OnlineStore.API
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
 			{
+				app.UseMiddleware<ExceptionMiddleware>();
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
