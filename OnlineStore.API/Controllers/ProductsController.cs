@@ -21,11 +21,13 @@ namespace OnlineStore.API.Controllers
 			_Mapper = mapper;
 		}
 		[HttpGet]
+		[ProducesResponseType(typeof(ProductToReturnDTO), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
 		{
 			var spec = new ProductWithTypeAndBrandSpecs();
 			var Products = await _ProductRepo.GetAllAsync(spec);
-
+			if(Products is null) { return NotFound(new ApiErrorResponse(404)); }
 			//Mapping
 			var MappedProducts = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductToReturnDTO>>(Products);
 			//OkObjectResult result = new OkObjectResult(Products);
@@ -35,6 +37,8 @@ namespace OnlineStore.API.Controllers
 		}
 
 		[HttpGet("{id}")]
+		[ProducesResponseType(typeof(ProductToReturnDTO) , StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(ApiErrorResponse) , StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<Product>> GetProduct(int id)
 		{
 			var specs = new ProductWithTypeAndBrandSpecs(id);
