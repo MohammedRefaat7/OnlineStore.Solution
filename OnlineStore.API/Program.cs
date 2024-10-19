@@ -1,10 +1,6 @@
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
-using OnlineStore.API.Errors;
 using OnlineStore.API.Helpers;
-using OnlineStore.API.Middlewares;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Repository;
@@ -37,24 +33,6 @@ namespace OnlineStore.API
 
 			// builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfiles() ));
 			builder.Services.AddAutoMapper(typeof(MappingProfiles));
-
-			builder.Services.Configure<ApiBehaviorOptions>(Options =>
-			{
-				// BehaviorOfModelStateResponseFactory
-				Options.InvalidModelStateResponseFactory = (ActionContext) =>
-				{
-					var Errors = ActionContext.ModelState.Where(p => p.Value.Errors.Count()>0)
-					                                     .SelectMany(p => p.Value.Errors)
-														 .Select(E => E.ErrorMessage)
-														 .ToList();
-
-					var ApiValidationError = new ApiValidationErrorResponse()
-					{
-						Errors = Errors 
-					};
-					return new BadRequestObjectResult(ApiValidationError);
-				};
-			});
 			#endregion
 
 			var app = builder.Build();
@@ -89,21 +67,18 @@ namespace OnlineStore.API
 			#region Configure the HTTP request pipeline [Middleware]. 
 
 			// Configure the HTTP request pipeline.
-			app.UseMiddleware<ExceptionMiddleware>();
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
-			// app.UseStatusCodePagesWithRedirects("errors/{0}");   //2 Request
-			app.UseStatusCodePagesWithReExecute("/errors/{0}");      // 1 Request
 			app.UseStaticFiles();
 			app.UseHttpsRedirection();
 
 			app.UseAuthorization();
 
 
-			app.MapControllers(); 
+			app.MapControllers();
 
 			#endregion
 
