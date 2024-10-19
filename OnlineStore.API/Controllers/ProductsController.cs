@@ -14,11 +14,16 @@ namespace OnlineStore.API.Controllers
 	{
 		private readonly IGenericRepository<Product> _ProductRepo;
 		private readonly IMapper _Mapper;
+		private readonly IGenericRepository<ProductType> _typeRepo;
+		private readonly IGenericRepository<ProductBrand> _brandRepo;
 
-		public ProductsController(IGenericRepository<Product> ProductRepo , IMapper mapper)
+		public ProductsController(IGenericRepository<Product> ProductRepo , IMapper mapper 
+			                     , IGenericRepository<ProductType> TypeRepo  , IGenericRepository<ProductBrand> BrandRepo)
 		{
 			_ProductRepo = ProductRepo;
 			_Mapper = mapper;
+			_typeRepo = TypeRepo;
+			_brandRepo = BrandRepo;
 		}
 		[HttpGet]
 		[ProducesResponseType(typeof(ProductToReturnDTO), StatusCodes.Status200OK)]
@@ -52,6 +57,24 @@ namespace OnlineStore.API.Controllers
 
 			return Ok(MappedProduct);
 		}
+
+		//Get All Types
+		[HttpGet("Types")]
+		public async Task<ActionResult<IEnumerable<ProductType>>> GetAllTypes()
+		{
+			var Types = await _typeRepo.GetAllAsync();
+			return Ok(Types);
+		}
+
+		//Get All Brands
+		[HttpGet("Brands")]
+		public async Task<ActionResult<IEnumerable<ProductBrand>>> GetAllBrands()
+		{
+			var Brands = await _brandRepo.GetAllAsync();
+			return Ok(Brands);
+		}
+
+
 
 		#region Check API Exception Response (ServerError)
 
