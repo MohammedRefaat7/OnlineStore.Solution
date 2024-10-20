@@ -28,13 +28,13 @@ namespace OnlineStore.API.Controllers
 		[HttpGet]
 		[ProducesResponseType(typeof(ProductToReturnDTO), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+		public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetAllProducts()
 		{
 			var spec = new ProductWithTypeAndBrandSpecs();
 			var Products = await _ProductRepo.GetAllAsync(spec);
 			if(Products is null) { return NotFound(new ApiErrorResponse(404)); }
 			//Mapping
-			var MappedProducts = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductToReturnDTO>>(Products);
+			var MappedProducts = _Mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDTO>>(Products);
 			//OkObjectResult result = new OkObjectResult(Products);
 			//return result;
 			
@@ -60,7 +60,7 @@ namespace OnlineStore.API.Controllers
 
 		//Get All Types
 		[HttpGet("Types")]
-		public async Task<ActionResult<IEnumerable<ProductType>>> GetAllTypes()
+		public async Task<ActionResult<IReadOnlyList<ProductType>>> GetAllTypes()
 		{
 			var Types = await _typeRepo.GetAllAsync();
 			return Ok(Types);
@@ -68,7 +68,7 @@ namespace OnlineStore.API.Controllers
 
 		//Get All Brands
 		[HttpGet("Brands")]
-		public async Task<ActionResult<IEnumerable<ProductBrand>>> GetAllBrands()
+		public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetAllBrands()
 		{
 			var Brands = await _brandRepo.GetAllAsync();
 			return Ok(Brands);

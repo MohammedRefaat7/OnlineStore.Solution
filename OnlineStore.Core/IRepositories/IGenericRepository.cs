@@ -10,10 +10,10 @@ namespace OnlineStore.Core.IRepositories
 {
 	public interface IGenericRepository<T> where T : BaseEntity
 	{
-		Task<IEnumerable<T>> GetAllAsync();
+		Task<IReadOnlyList<T>> GetAllAsync();
 		Task<T> GetByIdAsync(int id);
 
-		Task<IEnumerable<T>> GetAllAsync(ISpecification<T> Specs);
+		Task<IReadOnlyList<T>> GetAllAsync(ISpecification<T> Specs);
 		Task<T> GetByIdAsync(ISpecification<T> Specs);
 	}
 }
