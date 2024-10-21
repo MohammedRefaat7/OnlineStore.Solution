@@ -28,9 +28,9 @@ namespace OnlineStore.API.Controllers
 		[HttpGet]
 		[ProducesResponseType(typeof(ProductToReturnDTO), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetAllProducts(string? sort)
+		public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetAllProducts(string? sort, int? brandid, int? typeid)
 		{
-			var spec = new ProductWithTypeAndBrandSpecs(sort);
+			var spec = new ProductWithTypeAndBrandSpecs(sort , brandid , typeid);
 			var Products = await _ProductRepo.GetAllAsync(spec);
 			if(Products is null) { return NotFound(new ApiErrorResponse(404)); }
 			//Mapping

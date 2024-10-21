@@ -9,7 +9,14 @@ namespace OnlineStore.Core.Specifications
 {
 	public class ProductWithTypeAndBrandSpecs : BaseSpecification<Product>
 	{
-        public ProductWithTypeAndBrandSpecs(string? sort = null) : base()
+        public ProductWithTypeAndBrandSpecs(string? sort = null , int? BrandId =null , int? TypeId =null ) : 
+			base(p =>
+			         (
+			           (!BrandId.HasValue || p.ProductBrandId == BrandId) 
+			           &&
+			           (!TypeId.HasValue || p.ProductTypeId == TypeId )
+			         )
+				)
         {
             Includes.Add(P => P.ProductType);
             Includes.Add(P => P.ProductBrand);
