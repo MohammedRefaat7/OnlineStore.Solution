@@ -24,7 +24,14 @@ namespace OnlineStore.Core.Specifications
 		// List of Expression --> (Includes) ...
 		public List<Expression<Func<T , object>>> Includes { get; set; }
 
+        //SKIP(int)
+        public int Skip { get; set; }
 
+        // TAKE(int)
+        public int Take { get; set; }
+
+        //IsPaginationEnabled
+        public bool IsPaginationEnabled { get; set; }
 
     }
 }
