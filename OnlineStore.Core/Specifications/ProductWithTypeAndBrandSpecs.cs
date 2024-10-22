@@ -9,21 +9,21 @@ namespace OnlineStore.Core.Specifications
 {
 	public class ProductWithTypeAndBrandSpecs : BaseSpecification<Product>
 	{
-        public ProductWithTypeAndBrandSpecs(string? sort = null , int? BrandId =null , int? TypeId =null ) : 
+        public ProductWithTypeAndBrandSpecs(ProductSpecParams Params ) : 
 			base(p =>
 			         (
-			           (!BrandId.HasValue || p.ProductBrandId == BrandId) 
+			           (!Params.brandid.HasValue || p.ProductBrandId == Params.brandid) 
 			           &&
-			           (!TypeId.HasValue || p.ProductTypeId == TypeId )
+			           (!Params.typeid.HasValue || p.ProductTypeId == Params.typeid )
 			         )
 				)
         {
             Includes.Add(P => P.ProductType);
             Includes.Add(P => P.ProductBrand);
 
-			if (!string.IsNullOrEmpty(sort))
+			if (!string.IsNullOrEmpty(Params.sort))
 			{
-				switch (sort)
+				switch (Params.sort)
 				{
 					case "PriceAsc":
 					case "Price":
