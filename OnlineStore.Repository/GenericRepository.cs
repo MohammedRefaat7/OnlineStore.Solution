@@ -19,7 +19,7 @@ namespace OnlineStore.Repository
         {
 			_dbContext = dbContext;
 		}
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync()
 		{
 			//if(typeof(T) == typeof(Product))
 			//{
@@ -34,7 +34,7 @@ namespace OnlineStore.Repository
 			return await _dbContext.Set<T>().FindAsync(id);
 		}
 
-		public async Task<IEnumerable<T>> GetAllAsync(ISpecification<T> Specs)
+		public async Task<IReadOnlyList<T>> GetAllAsync(ISpecification<T> Specs)
 		{
 			return await ApplySpecification(Specs).ToListAsync();
 		}
@@ -47,6 +47,11 @@ namespace OnlineStore.Repository
 		private IQueryable<T> ApplySpecification(ISpecification<T> Specs)
 		{
 			return SpecificationEvalutor<T>.BuildQuery(_dbContext.Set<T>(), Specs);
+		}
+
+		public async Task<int> GetCountWithSpecAsync(ISpecification<T> Specs)
+		{
+			return await ApplySpecification(Specs).CountAsync();
 		}
 	}
 }

@@ -20,6 +20,21 @@ namespace OnlineStore.Repository
 				Query = Query.Where(Specs.Criteria);
 			}
 
+			if(Specs.OrderBy is not null)
+			{
+				Query = Query.OrderBy(Specs.OrderBy);
+			}
+
+			if(Specs.OrderByDescending is not null)
+			{
+				Query = Query.OrderByDescending(Specs.OrderByDescending);
+			}
+
+			if (Specs.IsPaginationEnabled)
+			{
+				Query = Query.Skip(Specs.Skip).Take(Specs.Take);
+			}
+
 			// _dbContext.Products.Include(p => p.ProductBrand).Include(p => p.ProductType).ToListAsync();
 			Query = Specs.Includes.Aggregate(Query, (CurrentQuery, IncludeExpression) => CurrentQuery.Include(IncludeExpression));
 

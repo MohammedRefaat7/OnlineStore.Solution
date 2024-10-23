@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
+using OnlineStore.API.Helpers;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Core.Specifications;
@@ -14,26 +15,34 @@ namespace OnlineStore.API.Controllers
 	{
 		private readonly IGenericRepository<Product> _ProductRepo;
 		private readonly IMapper _Mapper;
+		private readonly IGenericRepository<ProductType> _typeRepo;
+		private readonly IGenericRepository<ProductBrand> _brandRepo;
 
-		public ProductsController(IGenericRepository<Product> ProductRepo , IMapper mapper)
+		public ProductsController(IGenericRepository<Product> ProductRepo , IMapper mapper 
+			                     , IGenericRepository<ProductType> TypeRepo  , IGenericRepository<ProductBrand> BrandRepo)
 		{
 			_ProductRepo = ProductRepo;
 			_Mapper = mapper;
+			_typeRepo = TypeRepo;
+			_brandRepo = BrandRepo;
 		}
 		[HttpGet]
 		[ProducesResponseType(typeof(ProductToReturnDTO), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+		public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetAllProducts([FromQuery] ProductSpecParams Params)
 		{
-			var spec = new ProductWithTypeAndBrandSpecs();
+			var spec = new ProductWithTypeAndBrandSpecs(Params);
 			var Products = await _ProductRepo.GetAllAsync(spec);
 			if(Products is null) { return NotFound(new ApiErrorResponse(404)); }
 			//Mapping
-			var MappedProducts = _Mapper.Map<IEnumerable<Product>, IEnumerable<ProductToReturnDTO>>(Products);
+			var MappedProducts = _Mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDTO>>(Products);
+
+			var specForCount = new ProductWithFilterationSpecForCountAsync(Params); 
+		    var CountOfProducts = await _ProductRepo.GetCountWithSpecAsync(specForCount);
+
 			//OkObjectResult result = new OkObjectResult(Products);
 			//return result;
-			
-			return Ok(MappedProducts);
+			return Ok(new PaginationResponse<ProductToReturnDTO>(Params.PageSize , Params.PageIndex , CountOfProducts , MappedProducts));
 		}
 
 		[HttpGet("{id}")]
@@ -52,6 +61,24 @@ namespace OnlineStore.API.Controllers
 
 			return Ok(MappedProduct);
 		}
+
+		//Get All Types
+		[HttpGet("Types")]
+		public async Task<ActionResult<IReadOnlyList<ProductType>>> GetAllTypes()
+		{
+			var Types = await _typeRepo.GetAllAsync();
+			return Ok(Types);
+		}
+
+		//Get All Brands
+		[HttpGet("Brands")]
+		public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetAllBrands()
+		{
+			var Brands = await _brandRepo.GetAllAsync();
+			return Ok(Brands);
+		}
+
+
 
 		#region Check API Exception Response (ServerError)
 

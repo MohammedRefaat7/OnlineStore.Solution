@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.API.Errors;
+using OnlineStore.API.Extensions;
 using OnlineStore.API.Helpers;
 using OnlineStore.API.Middlewares;
 using OnlineStore.Core.IRepositories;
@@ -31,30 +32,8 @@ namespace OnlineStore.API
 				options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 			});
 
-			//builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
-			//builder.Services.AddScoped<IGenericRepository<ProductBrand>, GenericRepository<ProductBrand>>();
-			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-			// builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfiles() ));
-			builder.Services.AddAutoMapper(typeof(MappingProfiles));
-
-			builder.Services.Configure<ApiBehaviorOptions>(Options =>
-			{
-				// BehaviorOfModelStateResponseFactory
-				Options.InvalidModelStateResponseFactory = (ActionContext) =>
-				{
-					var Errors = ActionContext.ModelState.Where(p => p.Value.Errors.Count()>0)
-					                                     .SelectMany(p => p.Value.Errors)
-														 .Select(E => E.ErrorMessage)
-														 .ToList();
-
-					var ApiValidationError = new ApiValidationErrorResponse()
-					{
-						Errors = Errors 
-					};
-					return new BadRequestObjectResult(ApiValidationError);
-				};
-			});
+			
+			builder.Services.AddApplicationServices();  //Extension Method (CleaningUp ProgramClass)...
 			#endregion
 
 			var app = builder.Build();

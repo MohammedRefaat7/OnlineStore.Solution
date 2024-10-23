@@ -15,10 +15,23 @@ namespace OnlineStore.Core.Specifications
         // Where Condition (Filteration) --> (Criteria) ...
         public Expression<Func<T,bool>> Criteria { get; set; }
 
-        // List of Expression --> (Includes) ...
-        public List<Expression<Func<T , object>>> Includes { get; set; }
+        //Signature For OrderBy
+        public Expression<Func<T,object>> OrderBy { get; set; }
 
+		//Signature For OrderByDesc
+		public Expression<Func<T, object>> OrderByDescending { get; set; }
 
+		// List of Expression --> (Includes) ...
+		public List<Expression<Func<T , object>>> Includes { get; set; }
+
+        //SKIP(int)
+        public int Skip { get; set; }
+
+        // TAKE(int)
+        public int Take { get; set; }
+
+        //IsPaginationEnabled
+        public bool IsPaginationEnabled { get; set; }
 
     }
 }
