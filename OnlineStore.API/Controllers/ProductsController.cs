@@ -37,19 +37,12 @@ namespace OnlineStore.API.Controllers
 			//Mapping
 			var MappedProducts = _Mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDTO>>(Products);
 
-			//var ReturnedResponse = new PaginationResponse<ProductToReturnDTO>()
-			//{
-			//	PageSize = Params.PageSize,
-			//	PageIndex = Params.PageIndex,
-			//	Data = MappedProducts
-			//  Count = ;
-			//};
-			//var ReturnedResponse = new PaginationResponse<ProductToReturnDTO>(Params.PageSize , Params.PageSize , MappedProducts)
-			// return Ok(ReturnedResponse);
+			var specForCount = new ProductWithFilterationSpecForCountAsync(Params); 
+		    var CountOfProducts = await _ProductRepo.GetCountWithSpecAsync(specForCount);
 
 			//OkObjectResult result = new OkObjectResult(Products);
 			//return result;
-			return Ok(new PaginationResponse<ProductToReturnDTO>(Params.PageSize , Params.PageIndex , MappedProducts));
+			return Ok(new PaginationResponse<ProductToReturnDTO>(Params.PageSize , Params.PageIndex , CountOfProducts , MappedProducts));
 		}
 
 		[HttpGet("{id}")]

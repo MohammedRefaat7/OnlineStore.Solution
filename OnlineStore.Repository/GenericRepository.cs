@@ -48,5 +48,10 @@ namespace OnlineStore.Repository
 		{
 			return SpecificationEvalutor<T>.BuildQuery(_dbContext.Set<T>(), Specs);
 		}
+
+		public async Task<int> GetCountWithSpecAsync(ISpecification<T> Specs)
+		{
+			return await ApplySpecification(Specs).CountAsync();
+		}
 	}
 }
