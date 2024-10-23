@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
+using OnlineStore.API.Helpers;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Core.Specifications;
@@ -35,10 +36,20 @@ namespace OnlineStore.API.Controllers
 			if(Products is null) { return NotFound(new ApiErrorResponse(404)); }
 			//Mapping
 			var MappedProducts = _Mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDTO>>(Products);
+
+			//var ReturnedResponse = new PaginationResponse<ProductToReturnDTO>()
+			//{
+			//	PageSize = Params.PageSize,
+			//	PageIndex = Params.PageIndex,
+			//	Data = MappedProducts
+			//  Count = ;
+			//};
+			//var ReturnedResponse = new PaginationResponse<ProductToReturnDTO>(Params.PageSize , Params.PageSize , MappedProducts)
+			// return Ok(ReturnedResponse);
+
 			//OkObjectResult result = new OkObjectResult(Products);
 			//return result;
-			
-			return Ok(MappedProducts);
+			return Ok(new PaginationResponse<ProductToReturnDTO>(Params.PageSize , Params.PageIndex , MappedProducts));
 		}
 
 		[HttpGet("{id}")]
