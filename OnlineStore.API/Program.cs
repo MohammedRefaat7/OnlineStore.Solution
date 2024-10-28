@@ -10,6 +10,7 @@ using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Repository;
 using OnlineStore.Repository.Data;
+using StackExchange.Redis;
 
 namespace OnlineStore.API
 {
@@ -32,6 +33,11 @@ namespace OnlineStore.API
 				options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 			});
 
+			builder.Services.AddSingleton<IConnectionMultiplexer>( options =>
+			{
+				var Connection = builder.Configuration.GetConnectionString("RedisConnection");
+				return ConnectionMultiplexer.Connect(Connection);
+			});
 			
 			builder.Services.AddApplicationServices();  //Extension Method (CleaningUp ProgramClass)...
 			#endregion
