@@ -39,14 +39,9 @@ namespace OnlineStore.Repository
 			var CreatedOrUpdated = await _database.StringSetAsync( basket.Id , JsonBasket, TimeSpan.FromDays(1));
 
 			if (!CreatedOrUpdated)
-			{
-				return null;
-			}
+			{	return null;  }
 			else
-			{
-				return await GetBasketAsync(basket.Id);
-			}
-
+			{	return await GetBasketAsync(basket.Id);  }
 		}
 	}
 }

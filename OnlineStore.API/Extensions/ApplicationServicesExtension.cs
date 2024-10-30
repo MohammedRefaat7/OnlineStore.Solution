@@ -14,6 +14,8 @@ namespace OnlineStore.API.Extensions
 			//builder.Services.AddScoped<IGenericRepository<ProductBrand>, GenericRepository<ProductBrand>>();
 			Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+			Services.AddScoped(typeof(IBasketRepository), typeof(BasketRepository));
+
 			// builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfiles() ));
 			Services.AddAutoMapper(typeof(MappingProfiles));
 
