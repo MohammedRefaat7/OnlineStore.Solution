@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using OnlineStore.API.Helpers;
 using OnlineStore.API.Middlewares;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
+using OnlineStore.Core.Models.Identity;
 using OnlineStore.Repository;
 using OnlineStore.Repository.Data;
 using OnlineStore.Repository.Identity;
@@ -46,6 +48,9 @@ namespace OnlineStore.API
 			});
 			
 			builder.Services.AddApplicationServices();  //Extension Method (CleaningUp ProgramClass)...
+
+			builder.Services.AddIdentityServices();      //Extension Method (CleaningUp ProgramClass)...
+
 			#endregion
 
 			var app = builder.Build();
@@ -67,6 +72,9 @@ namespace OnlineStore.API
 
 				var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
 				await IdentityDbContext.Database.MigrateAsync();
+
+				var userManager = Services.GetRequiredService<UserManager<AppUser>>();
+				await AppIdentityDbContextSeed.SeedUserAsync(userManager);
 
 				await OnlineStoreContextSeed.SeedAsync(DbContext);
 				// Execute only in The Initial Setup of an Application
