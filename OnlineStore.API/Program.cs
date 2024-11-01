@@ -10,6 +10,7 @@ using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
 using OnlineStore.Repository;
 using OnlineStore.Repository.Data;
+using OnlineStore.Repository.Identity;
 using StackExchange.Redis;
 
 namespace OnlineStore.API
@@ -31,6 +32,11 @@ namespace OnlineStore.API
 			builder.Services.AddDbContext<OnlineStoreDbContext>(options =>
 			{
 				options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+			});
+
+			builder.Services.AddDbContext<AppIdentityDbContext>(options =>
+			{
+				options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
 			});
 
 			builder.Services.AddSingleton<IConnectionMultiplexer>( options =>
@@ -58,6 +64,9 @@ namespace OnlineStore.API
 				// Ask CLR For Creating Object form DbContext Explicitly
 
 				await DbContext.Database.MigrateAsync(); // Apply pending migrations
+
+				var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
+				await IdentityDbContext.Database.MigrateAsync();
 
 				await OnlineStoreContextSeed.SeedAsync(DbContext);
 				// Execute only in The Initial Setup of an Application
