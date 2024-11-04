@@ -10,10 +10,12 @@ namespace OnlineStore.API.Controllers
 	public class AccountsController : APIBaseController
 	{
 		private readonly UserManager<AppUser> _userManager;
+		private readonly SignInManager<AppUser> _signInManager;
 
-		public AccountsController(UserManager<AppUser> userManager )
+		public AccountsController(UserManager<AppUser> userManager , SignInManager<AppUser> signInManager )
         {
 			_userManager = userManager;
+			_signInManager = signInManager;
 		}
 
 
@@ -42,6 +44,24 @@ namespace OnlineStore.API.Controllers
 				};
 				return Ok(ReturnedUser);
 			}
+		}
+
+		// Login 
+		[HttpPost("Login")]
+		public async Task<ActionResult<UserDto>> Login(LoginDto model)
+		{
+			var User = await _userManager.FindByEmailAsync(model.Email);
+			if (User is null) return Unauthorized(new ApiErrorResponse(401));
+
+			var Result = await _signInManager.CheckPasswordSignInAsync(User, model.Password, false);
+			if (!Result.Succeeded) return Unauthorized(new ApiErrorResponse(401));
+
+			return Ok(new UserDto()
+			{
+				Email = User.Email , 
+				DisplayName = User.DisplayName ,
+				Token = "ThisWillBeToken"
+			});
 		}
 	}
 }
