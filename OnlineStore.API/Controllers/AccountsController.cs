@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
+using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Identity;
 
 namespace OnlineStore.API.Controllers
@@ -11,11 +12,13 @@ namespace OnlineStore.API.Controllers
 	{
 		private readonly UserManager<AppUser> _userManager;
 		private readonly SignInManager<AppUser> _signInManager;
+		private readonly ITokenService _tokenService;
 
-		public AccountsController(UserManager<AppUser> userManager , SignInManager<AppUser> signInManager )
+		public AccountsController(UserManager<AppUser> userManager , SignInManager<AppUser> signInManager , ITokenService tokenService )
         {
 			_userManager = userManager;
 			_signInManager = signInManager;
+		    _tokenService = tokenService;
 		}
 
 
@@ -40,7 +43,7 @@ namespace OnlineStore.API.Controllers
 				{
 					Email = User.Email,
 					DisplayName = User.DisplayName,
-					Token = "ThisWillBeToken!!"
+					Token = await _tokenService.CreateTokenAsync(User, _userManager)
 				};
 				return Ok(ReturnedUser);
 			}
@@ -60,7 +63,7 @@ namespace OnlineStore.API.Controllers
 			{
 				Email = User.Email , 
 				DisplayName = User.DisplayName ,
-				Token = "ThisWillBeToken"
+				Token = await _tokenService.CreateTokenAsync(User,_userManager)
 			});
 		}
 	}
