@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +9,11 @@ using OnlineStore.API.Helpers;
 using OnlineStore.API.Middlewares;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
+using OnlineStore.Core.Models.Identity;
 using OnlineStore.Repository;
 using OnlineStore.Repository.Data;
+using OnlineStore.Repository.Identity;
+using StackExchange.Redis;
 
 namespace OnlineStore.API
 {
@@ -32,8 +36,21 @@ namespace OnlineStore.API
 				options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 			});
 
+			builder.Services.AddDbContext<AppIdentityDbContext>(options =>
+			{
+				options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+			});
+
+			builder.Services.AddSingleton<IConnectionMultiplexer>( options =>
+			{
+				var Connection = builder.Configuration.GetConnectionString("RedisConnection");
+				return ConnectionMultiplexer.Connect(Connection);
+			});
 			
 			builder.Services.AddApplicationServices();  //Extension Method (CleaningUp ProgramClass)...
+
+			builder.Services.AddIdentityServices(builder.Configuration);      //Extension Method (CleaningUp ProgramClass)...
+
 			#endregion
 
 			var app = builder.Build();
@@ -52,6 +69,12 @@ namespace OnlineStore.API
 				// Ask CLR For Creating Object form DbContext Explicitly
 
 				await DbContext.Database.MigrateAsync(); // Apply pending migrations
+
+				var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
+				await IdentityDbContext.Database.MigrateAsync();
+
+				var userManager = Services.GetRequiredService<UserManager<AppUser>>();
+				await AppIdentityDbContextSeed.SeedUserAsync(userManager);
 
 				await OnlineStoreContextSeed.SeedAsync(DbContext);
 				// Execute only in The Initial Setup of an Application
@@ -78,7 +101,7 @@ namespace OnlineStore.API
 			app.UseStatusCodePagesWithReExecute("/errors/{0}");      // 1 Request
 			app.UseStaticFiles();
 			app.UseHttpsRedirection();
-
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 
