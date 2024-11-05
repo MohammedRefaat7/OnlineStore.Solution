@@ -29,6 +29,15 @@ namespace OnlineStore.Core.Specifications
 			set { pageIndex = value < 1 ? 1 : value; }
 		}
 
+		private string? search;
+
+		public string? Search
+		{
+			get { return search; }
+			set { search = value.ToLower(); }
+		}
+
+
 
 	}
 }

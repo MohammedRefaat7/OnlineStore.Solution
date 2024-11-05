@@ -13,7 +13,9 @@ namespace OnlineStore.Core.Specifications
         public ProductWithTypeAndBrandSpecs(ProductSpecParams Params ) : 
 			base(p =>
 			         (
-			           (!Params.brandid.HasValue || p.ProductBrandId == Params.brandid) 
+			           (string.IsNullOrEmpty(Params.Search) || p.Name.ToLower().Contains(Params.Search))
+					   &&
+					   (!Params.brandid.HasValue || p.ProductBrandId == Params.brandid) 
 			           &&
 			           (!Params.typeid.HasValue || p.ProductTypeId == Params.typeid )
 			         )
