@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
@@ -26,6 +28,8 @@ namespace OnlineStore.API.Controllers
 			_typeRepo = TypeRepo;
 			_brandRepo = BrandRepo;
 		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		[HttpGet]
 		[ProducesResponseType(typeof(ProductToReturnDTO), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]

@@ -49,7 +49,7 @@ namespace OnlineStore.API
 			
 			builder.Services.AddApplicationServices();  //Extension Method (CleaningUp ProgramClass)...
 
-			builder.Services.AddIdentityServices();      //Extension Method (CleaningUp ProgramClass)...
+			builder.Services.AddIdentityServices(builder.Configuration);      //Extension Method (CleaningUp ProgramClass)...
 
 			#endregion
 
@@ -101,7 +101,7 @@ namespace OnlineStore.API
 			app.UseStatusCodePagesWithReExecute("/errors/{0}");      // 1 Request
 			app.UseStaticFiles();
 			app.UseHttpsRedirection();
-
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 
