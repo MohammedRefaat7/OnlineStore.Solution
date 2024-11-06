@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Identity;
+using System.Security.Claims;
 
 namespace OnlineStore.API.Controllers
 {
@@ -14,16 +17,16 @@ namespace OnlineStore.API.Controllers
 		private readonly SignInManager<AppUser> _signInManager;
 		private readonly ITokenService _tokenService;
 
-		public AccountsController(UserManager<AppUser> userManager , SignInManager<AppUser> signInManager , ITokenService tokenService )
-        {
+		public AccountsController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService)
+		{
 			_userManager = userManager;
 			_signInManager = signInManager;
-		    _tokenService = tokenService;
+			_tokenService = tokenService;
 		}
 
 
-        // Register
-        [HttpPost("Register")]
+		// Register
+		[HttpPost("Register")]
 		public async Task<ActionResult<UserDto>> Register(RegisterDto model)
 		{
 			var User = new AppUser()
@@ -61,10 +64,26 @@ namespace OnlineStore.API.Controllers
 
 			return Ok(new UserDto()
 			{
-				Email = User.Email , 
-				DisplayName = User.DisplayName ,
-				Token = await _tokenService.CreateTokenAsync(User,_userManager)
+				Email = User.Email,
+				DisplayName = User.DisplayName,
+				Token = await _tokenService.CreateTokenAsync(User, _userManager)
 			});
+		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpGet("CurrentUser")]
+		public async Task<ActionResult<UserDto>> GetCurrentUser()
+		{
+			var email = User.FindFirstValue(ClaimTypes.Email);
+			var user = await _userManager.FindByEmailAsync(email);
+
+			var ReturnedUser = new UserDto()
+			{
+				Email = user.Email,
+				DisplayName = user.DisplayName,
+				Token = await _tokenService.CreateTokenAsync(user, _userManager)
+			};
+			return Ok(ReturnedUser);
 		}
 	}
 }
