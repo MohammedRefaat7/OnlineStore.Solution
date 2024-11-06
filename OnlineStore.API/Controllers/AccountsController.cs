@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
+using OnlineStore.API.Extensions;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Identity;
 using System.Security.Claims;
@@ -16,12 +18,15 @@ namespace OnlineStore.API.Controllers
 		private readonly UserManager<AppUser> _userManager;
 		private readonly SignInManager<AppUser> _signInManager;
 		private readonly ITokenService _tokenService;
+		private readonly IMapper _mapper;
 
-		public AccountsController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService)
+		public AccountsController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, 
+			                      ITokenService tokenService , IMapper mapper)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_tokenService = tokenService;
+			_mapper = mapper;
 		}
 
 
@@ -84,6 +89,22 @@ namespace OnlineStore.API.Controllers
 				Token = await _tokenService.CreateTokenAsync(user, _userManager)
 			};
 			return Ok(ReturnedUser);
+		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpGet("Address")]
+		public async Task<ActionResult<AddressDto?>> GetCurrentUserAddress()
+		{
+			var user = await _userManager.FindUserWithAddressAsync(User);
+
+			if(user?.Address is null)
+			{
+				return NotFound(new ApiErrorResponse(404, "The current User doesn't have an associated Address."));
+			}
+			var MappedAdrress = _mapper.Map<Address, AddressDto>(user.Address);
+
+			return Ok(MappedAdrress);
+
 		}
 	}
 }
