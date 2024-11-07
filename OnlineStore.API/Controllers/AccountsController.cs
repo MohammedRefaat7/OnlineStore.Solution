@@ -12,6 +12,7 @@ using OnlineStore.API.Helpers;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Identity;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace OnlineStore.API.Controllers
 {
@@ -36,6 +37,11 @@ namespace OnlineStore.API.Controllers
 		[HttpPost("Register")]
 		public async Task<ActionResult<UserDto>> Register(RegisterDto model)
 		{
+			if (CheckEmailExists(model.Email).Result.Value)
+			{
+				return BadRequest(new ApiErrorResponse(400, "The Email Address you entered is already associated with an account. Please use a different Email."));
+			}
+
 			var User = new AppUser()
 			{
 				Email = model.Email,
@@ -131,6 +137,22 @@ namespace OnlineStore.API.Controllers
 
 		}
 
-		
+
+		[HttpGet("Email")]
+		public async Task<ActionResult<bool>> CheckEmailExists(string Email)
+		{
+			
+
+			// Check if the email matches the pattern
+			if (!Email.IsEmailPattern())
+			{
+				// Return false if the email structure is invalid
+				return BadRequest(new ApiErrorResponse(400, "Invalid Email format."));
+			}
+
+			//var user = await _userManager.FindByEmailAsync(Email);
+			//if(user is null) { return false; }
+			return await _userManager.FindByEmailAsync(Email) is not null ;
+		}
 	}
 }
