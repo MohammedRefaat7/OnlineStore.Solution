@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
 using OnlineStore.API.Extensions;
+using OnlineStore.API.Helpers;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Identity;
 using System.Security.Claims;
@@ -106,5 +108,29 @@ namespace OnlineStore.API.Controllers
 			return Ok(MappedAdrress);
 
 		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpPut("Address")]
+		public async Task<ActionResult<AddressDto>> UpdateAddress(AddressDto UpdatedAddress)
+		{
+			if (ValidationHelper.AnyNullOrEmpty(UpdatedAddress.FirstName, UpdatedAddress.LastName
+								   , UpdatedAddress.Country, UpdatedAddress.City, UpdatedAddress.Street)) 
+			{
+				return BadRequest(new ApiErrorResponse(404, "Please Enter a new Address"));
+			}
+
+			var user = await _userManager.FindUserWithAddressAsync(User);
+			var MappedAddress = _mapper.Map<AddressDto, Address>(UpdatedAddress);
+			MappedAddress.Id = user.Address.Id;
+			user.Address = MappedAddress;
+			var Result = await _userManager.UpdateAsync(user);
+			if (!Result.Succeeded)
+				return BadRequest(new ApiErrorResponse(400));
+			var ReturnedAddress = _mapper.Map<Address, AddressDto>(user.Address);
+			return Ok(ReturnedAddress);
+
+		}
+
+		
 	}
 }

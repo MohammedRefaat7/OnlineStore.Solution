@@ -14,7 +14,7 @@ namespace OnlineStore.API.Helpers
                 .ForMember(d => d.ProductBrandName, o => o.MapFrom(s => s.ProductBrand.Name))
                 .ForMember(d => d.PictureUrl , o => o.MapFrom<ProductPictureUrlResolver>());
 
-            CreateMap<Address, AddressDto>();
+            CreateMap<Address, AddressDto>().ReverseMap();
         }
     }
 }
