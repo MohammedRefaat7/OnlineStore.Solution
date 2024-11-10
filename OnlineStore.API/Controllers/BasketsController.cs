@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.Models;
@@ -11,10 +13,12 @@ namespace OnlineStore.API.Controllers
 	public class BasketsController : APIBaseController
 	{
 		private readonly IBasketRepository _basketRepository;
+		private readonly IMapper _mapper;
 
-		public BasketsController(IBasketRepository BasketRepository)
+		public BasketsController(IBasketRepository BasketRepository , IMapper mapper)
 		{
 			_basketRepository = BasketRepository;
+			this._mapper = mapper;
 		}
 
 		// Get or Recreate new Basket
@@ -27,9 +31,10 @@ namespace OnlineStore.API.Controllers
 
 		// Update Or Create new Basket
 		[HttpPost]
-		public async Task<ActionResult<CustomerBasket>> UpdateBasket(CustomerBasket basket)
+		public async Task<ActionResult<CustomerBasket>> UpdateBasket(CustomerBasketDTO basket)
 		{
-			var CreatedOrUpdatedBasket = await _basketRepository.UpdateBasketAsync(basket);
+			var MappedBasket = _mapper.Map<CustomerBasketDTO, CustomerBasket>(basket);
+			var CreatedOrUpdatedBasket = await _basketRepository.UpdateBasketAsync(MappedBasket);
 
 			if (CreatedOrUpdatedBasket is null) 
 				return BadRequest(new ApiErrorResponse(400));
