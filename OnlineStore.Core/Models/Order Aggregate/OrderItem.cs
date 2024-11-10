@@ -10,7 +10,7 @@ namespace OnlineStore.Core.Models.Order_Aggregate
 	{
         public ProductItemOrdered Product { get; set; }
         public int Quantity { get; set; }
-        public int Price { get; set; }
+        public decimal Price { get; set; }
 
     }
 }

@@ -23,7 +23,7 @@ namespace OnlineStore.Repository.Data
 			//modelBuilder.ApplyConfiguration(new ProductBrandConfig());
 			//modelBuilder.ApplyConfiguration(new ProductTypeConfig())
 
-			modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+			modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());  //Already Applied (For All Configurations)
 			base.OnModelCreating(modelBuilder);
 		}
 
