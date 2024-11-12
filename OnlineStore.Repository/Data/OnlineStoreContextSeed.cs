@@ -1,4 +1,5 @@
 ﻿using OnlineStore.Core.Models;
+using OnlineStore.Core.Models.Order_Aggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace OnlineStore.Repository.Data
 					{
 						await dbContext.Set<ProductBrand>().AddAsync(Brand);
 					}
-					await dbContext.SaveChangesAsync();
+
 				}
 			}
 
@@ -36,11 +37,11 @@ namespace OnlineStore.Repository.Data
 
 				if (Types?.Count > 0)
 				{
-					foreach(var Type in Types)
+					foreach (var Type in Types)
 					{
 						await dbContext.Set<ProductType>().AddAsync(Type);
 					}
-					await dbContext.SaveChangesAsync();
+
 				}
 			}
 
@@ -52,13 +53,31 @@ namespace OnlineStore.Repository.Data
 
 				if (Products?.Count > 0)
 				{
-					foreach(var P in Products)
+					foreach (var P in Products)
 					{
 						await dbContext.Set<Product>().AddAsync(P);
 					}
-					await dbContext.SaveChangesAsync();
+
 				}
 			}
+
+			if (!dbContext.DeliveryMethods.Any())
+			{
+				var DeliveryMethodsData = File.ReadAllText("../OnlineStore.Repository/Data/DataSeed/delivery.json");
+
+				var DeliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(DeliveryMethodsData);
+
+				if (DeliveryMethods?.Count > 0)
+				{
+					foreach (var DM in DeliveryMethods)
+					{
+						await dbContext.Set<DeliveryMethod>().AddAsync(DM);
+					}
+					
+				}
+			}
+
+			await dbContext.SaveChangesAsync();
 		}
 	}
 }
