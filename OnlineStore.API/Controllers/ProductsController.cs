@@ -21,7 +21,7 @@ namespace OnlineStore.API.Controllers
 		private readonly IGenericRepository<ProductBrand> _brandRepo;
 
 		public ProductsController(IGenericRepository<Product> ProductRepo , IMapper mapper 
-			                     , IGenericRepository<ProductType> TypeRepo  , IGenericRepository<ProductBrand> BrandRepo)
+			              , IGenericRepository<ProductType> TypeRepo  , IGenericRepository<ProductBrand> BrandRepo)
 		{
 			_ProductRepo = ProductRepo;
 			_Mapper = mapper;

@@ -12,6 +12,8 @@ namespace OnlineStore.Core.Specifications
         public ProductWithFilterationSpecForCountAsync( ProductSpecParams Params)
             :base(p =>
 					 (
+			           (string.IsNullOrEmpty(Params.Search) || p.Name.ToLower().Contains(Params.Search))
+					   &&
 					   (!Params.brandid.HasValue || p.ProductBrandId == Params.brandid)
 					   &&
 					   (!Params.typeid.HasValue || p.ProductTypeId == Params.typeid)

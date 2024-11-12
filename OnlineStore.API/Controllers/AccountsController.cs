@@ -1,10 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
+using OnlineStore.API.Extensions;
+using OnlineStore.API.Helpers;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Identity;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace OnlineStore.API.Controllers
 {
@@ -13,19 +21,27 @@ namespace OnlineStore.API.Controllers
 		private readonly UserManager<AppUser> _userManager;
 		private readonly SignInManager<AppUser> _signInManager;
 		private readonly ITokenService _tokenService;
+		private readonly IMapper _mapper;
 
-		public AccountsController(UserManager<AppUser> userManager , SignInManager<AppUser> signInManager , ITokenService tokenService )
-        {
+		public AccountsController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, 
+			                      ITokenService tokenService , IMapper mapper)
+		{
 			_userManager = userManager;
 			_signInManager = signInManager;
-		    _tokenService = tokenService;
+			_tokenService = tokenService;
+			_mapper = mapper;
 		}
 
 
-        // Register
-        [HttpPost("Register")]
+		// Register
+		[HttpPost("Register")]
 		public async Task<ActionResult<UserDto>> Register(RegisterDto model)
 		{
+			if (CheckEmailExists(model.Email).Result.Value)
+			{
+				return BadRequest(new ApiErrorResponse(400, "The Email Address you entered is already associated with an account. Please use a different Email."));
+			}
+
 			var User = new AppUser()
 			{
 				Email = model.Email,
@@ -61,10 +77,82 @@ namespace OnlineStore.API.Controllers
 
 			return Ok(new UserDto()
 			{
-				Email = User.Email , 
-				DisplayName = User.DisplayName ,
-				Token = await _tokenService.CreateTokenAsync(User,_userManager)
+				Email = User.Email,
+				DisplayName = User.DisplayName,
+				Token = await _tokenService.CreateTokenAsync(User, _userManager)
 			});
+		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpGet("CurrentUser")]
+		public async Task<ActionResult<UserDto>> GetCurrentUser()
+		{
+			var email = User.FindFirstValue(ClaimTypes.Email);
+			var user = await _userManager.FindByEmailAsync(email);
+
+			var ReturnedUser = new UserDto()
+			{
+				Email = user.Email,
+				DisplayName = user.DisplayName,
+				Token = await _tokenService.CreateTokenAsync(user, _userManager)
+			};
+			return Ok(ReturnedUser);
+		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpGet("Address")]
+		public async Task<ActionResult<AddressDto?>> GetCurrentUserAddress()
+		{
+			var user = await _userManager.FindUserWithAddressAsync(User);
+
+			if(user?.Address is null)
+			{
+				return NotFound(new ApiErrorResponse(404, "The current User doesn't have an associated Address."));
+			}
+			var MappedAdrress = _mapper.Map<Address, AddressDto>(user.Address);
+
+			return Ok(MappedAdrress);
+
+		}
+
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpPut("Address")]
+		public async Task<ActionResult<AddressDto>> UpdateAddress(AddressDto UpdatedAddress)
+		{
+			if (ValidationHelper.AnyNullOrEmpty(UpdatedAddress.FirstName, UpdatedAddress.LastName
+								   , UpdatedAddress.Country, UpdatedAddress.City, UpdatedAddress.Street)) 
+			{
+				return BadRequest(new ApiErrorResponse(404, "Please Enter a new Address"));
+			}
+
+			var user = await _userManager.FindUserWithAddressAsync(User);
+			var MappedAddress = _mapper.Map<AddressDto, Address>(UpdatedAddress);
+			MappedAddress.Id = user.Address.Id;
+			user.Address = MappedAddress;
+			var Result = await _userManager.UpdateAsync(user);
+			if (!Result.Succeeded)
+				return BadRequest(new ApiErrorResponse(400));
+			var ReturnedAddress = _mapper.Map<Address, AddressDto>(user.Address);
+			return Ok(ReturnedAddress);
+
+		}
+
+
+		[HttpGet("Email")]
+		public async Task<ActionResult<bool>> CheckEmailExists(string Email)
+		{
+			
+
+			// Check if the email matches the pattern
+			if (!Email.IsEmailPattern())
+			{
+				// Return false if the email structure is invalid
+				return BadRequest(new ApiErrorResponse(400, "Invalid Email format."));
+			}
+
+			//var user = await _userManager.FindByEmailAsync(Email);
+			//if(user is null) { return false; }
+			return await _userManager.FindByEmailAsync(Email) is not null ;
 		}
 	}
 }
