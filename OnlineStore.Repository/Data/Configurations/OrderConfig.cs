@@ -19,6 +19,10 @@ namespace OnlineStore.Repository.Data.Configurations
 			builder.Property(O => O.SubTotal).HasColumnType("decimal(18,2)");
 
 			builder.OwnsOne(O => O.ShippingAddress, ShA => ShA.WithOwner());
+
+			builder.HasOne(O => O.DeliveryMethod)
+				   .WithMany()
+				   .OnDelete(DeleteBehavior.NoAction);
 		}
 	}
 }
