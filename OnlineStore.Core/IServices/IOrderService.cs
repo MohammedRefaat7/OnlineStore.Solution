@@ -10,7 +10,7 @@ namespace OnlineStore.Core.IServices
 	public interface IOrderService
 	{
 		// Create Order
-		Task<Order> CreateOrderAsync(string BuyerEmail, string BasketId, int DeliveryMethodId, Address ShippingAddress);
+		Task<Order?> CreateOrderAsync(string BuyerEmail, string BasketId, int DeliveryMethodId, Address ShippingAddress);
 
 		// Get All Orders For Specific User
 		Task<IReadOnlyList<Order>> GetOrdersForSpecificUserAsync(string BuyerEmail);

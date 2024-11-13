@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using OnlineStore.Core;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models;
@@ -14,54 +15,54 @@ namespace OnlineStore.Service
 {
 	public class OrderService : IOrderService
 	{
-		private readonly IGenericRepository<DeliveryMethod> _deliveryMethodRepo;
+		
 		private readonly IBasketRepository _basketRepository;
-		private readonly IGenericRepository<Product> _productRepo;
-		private readonly IGenericRepository<Order> _orderRepo;
+		private readonly IUnitOfWork _unitOfWork;
 
-		public OrderService(IGenericRepository<DeliveryMethod> DeliveryMethodRepo , IBasketRepository BasketRepository,
-			                IGenericRepository<Product> ProductRepo , IGenericRepository<Order> OrderRepo)
-        {
-			_deliveryMethodRepo = DeliveryMethodRepo;
+		public OrderService(IBasketRepository BasketRepository, IUnitOfWork unitOfWork)
+        {	
 			_basketRepository = BasketRepository;
-			_productRepo = ProductRepo;
-			_orderRepo = OrderRepo;
+			_unitOfWork = unitOfWork;
 		}
-        public async Task<Order> CreateOrderAsync(string BuyerEmail, string BasketId, int DeliveryMethodId, Address ShippingAddress)
+        public async Task<Order?> CreateOrderAsync(string BuyerEmail, string BasketId, int DeliveryMethodId, Address ShippingAddress)
 		{
 
 			//1.Get Basket From Basket Repo
-			 //var Basket = await _basketRepository.GetBasketAsync(BasketId);
+			var Basket = await _basketRepository.GetBasketAsync(BasketId);
 
-		    //2.Get Selected Items at Basket From Product Repo
-			 //var OrderItems = new List<OrderItem>();
-			 //if (Basket?.Items.Count > 0)
-			//{
-			//	foreach (var item in Basket.Items)
-			//	{
-			//		var product = await _productRepo.GetByIdAsync(item.Id);
+		   //2.Get Selected Items at Basket From Product Repo
+			var OrderItems = new List<OrderItem>();
 
-			//		var productItemOrdered = new ProductItemOrdered(item.Id, product.Name, product.PictureUrl);
-			//		var orderitem = new OrderItem(productItemOrdered, item.Quantity, product.Price);
-			//		OrderItems.Add(orderitem);
-			//	}
-			//}
+			if(Basket?.Items.Count > 0)
+			{
+				foreach(var item in Basket.Items)
+				{
+					var Product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.Id);
 
-			
-			//3.Calculate SubTotal
-			 //var SubTotal = OrderItems.Sum(I => I.Price * I.Quantity);
+					var ProductItemOrdered = new ProductItemOrdered(Product.Id, Product.Name, Product.PictureUrl);
+					var OrderItem = new OrderItem(ProductItemOrdered, item.Quantity, Product.Price);
+					OrderItems.Add(OrderItem);
+				}
+			}
 
-			//4.Get Delivery Method From DeliveryMethod Repo
-			 //var DeliveryMethod = await _deliveryMethodRepo.GetByIdAsync(DeliveryMethodId);
+		   //3.Calculate SubTotal
+			var SubTotal = OrderItems.Sum(I => I.Price * I.Quantity);
 
-			//5.Create Order
-			 //var Order = new Order(BuyerEmail, ShippingAddress, DeliveryMethod, OrderItems, SubTotal);
-            
-			//6.Add Order Locally
-			 //await _orderRepo.AddAsync(Order);
-			
+		   //4.Get Delivery Method From DeliveryMethod Repo
+			var DeliveryMethod = await _unitOfWork.Repository<DeliveryMethod>().GetByIdAsync(DeliveryMethodId);
+
+		   //5.Create Order
+			var Order = new Order(BuyerEmail, ShippingAddress, DeliveryMethod, OrderItems, SubTotal);
+
+		   //6.Add Order Locally
+		    await _unitOfWork.Repository<Order>().AddAsync(Order);
+
 			//7.Save Order To Database
-			throw new NotImplementedException();
+			var Result = await _unitOfWork.CompleteAsync();
+
+			if (Result <= 0) return null;
+
+			return Order;
 		}
 
 		public Task<Order> GetOrderByIdForSpecificUserAsync(string BuyerEmail, int OrderId)

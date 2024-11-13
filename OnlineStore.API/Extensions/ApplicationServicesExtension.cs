@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnlineStore.API.Errors;
 using OnlineStore.API.Helpers;
+using OnlineStore.Core;
 using OnlineStore.Core.IRepositories;
 using OnlineStore.Repository;
 
@@ -18,6 +19,8 @@ namespace OnlineStore.API.Extensions
 
 			// builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfiles() ));
 			Services.AddAutoMapper(typeof(MappingProfiles));
+
+			Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 			#region Error Handling
 			Services.Configure<ApiBehaviorOptions>(Options =>
