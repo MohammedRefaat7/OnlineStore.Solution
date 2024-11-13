@@ -16,5 +16,8 @@ namespace OnlineStore.Core.IRepositories
 		Task<IReadOnlyList<T>> GetAllAsync(ISpecification<T> Specs);
 		Task<T> GetByIdAsync(ISpecification<T> Specs);
 		Task<int> GetCountWithSpecAsync(ISpecification<T> Specs);
+		Task AddAsync(T Item);
+		void Update(T Item);
+		void Delete(T Item);
 	}
 }
