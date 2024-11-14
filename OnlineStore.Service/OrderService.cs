@@ -66,9 +66,13 @@ namespace OnlineStore.Service
 			return Order;
 		}
 
-		public Task<Order> GetOrderByIdForSpecificUserAsync(string BuyerEmail, int OrderId)
+		public async Task<Order?> GetOrderByIdForSpecificUserAsync(string BuyerEmail, int OrderId)
 		{
-			throw new NotImplementedException();
+			var Spec = new OrderSpecifications(BuyerEmail, OrderId);
+
+			var Order = await _unitOfWork.Repository<Order>().GetByIdAsync(Spec);
+
+			return Order;
 		}
 
 		public async Task<IReadOnlyList<Order?>> GetOrdersForSpecificUserAsync(string BuyerEmail)

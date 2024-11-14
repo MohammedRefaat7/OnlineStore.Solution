@@ -15,6 +15,13 @@ namespace OnlineStore.Core.Specifications.OrderSpecs
             Includes.Add(O => O.Items);
             AddOrderByDesc(O => O.DateTimeOffset);
         }
+
+        public OrderSpecifications( string BuyerEmail , int OrderId)
+                                  :base(O => O.Id == OrderId && O.BuyerEmail == BuyerEmail)
+        {
+			Includes.Add(O => O.DeliveryMethod);
+			Includes.Add(O => O.Items);
+		}
     }
 }
 

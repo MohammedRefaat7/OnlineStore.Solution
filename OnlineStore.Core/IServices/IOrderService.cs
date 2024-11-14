@@ -16,6 +16,6 @@ namespace OnlineStore.Core.IServices
 		Task<IReadOnlyList<Order?>> GetOrdersForSpecificUserAsync(string BuyerEmail);
 
 		// Get Order By ID For Specific User
-		Task<Order> GetOrderByIdForSpecificUserAsync(string BuyerEmail, int OrderId);
+		Task<Order?> GetOrderByIdForSpecificUserAsync(string BuyerEmail, int OrderId);
 	}
 }
