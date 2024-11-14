@@ -71,7 +71,7 @@ namespace OnlineStore.Service
 			throw new NotImplementedException();
 		}
 
-		public async Task<IReadOnlyList<Order>> GetOrdersForSpecificUserAsync(string BuyerEmail)
+		public async Task<IReadOnlyList<Order?>> GetOrdersForSpecificUserAsync(string BuyerEmail)
 		{
 			var Spec = new OrderSpecifications(BuyerEmail);
 

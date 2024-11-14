@@ -33,5 +33,19 @@ namespace OnlineStore.API.Controllers
 			if (Order is null) return BadRequest(new ApiErrorResponse(400, "There is a Problem with your Order"));
 			return Ok(Order);
 		}
+
+		[ProducesResponseType(typeof(IReadOnlyList<Order>) , StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(ApiErrorResponse) , StatusCodes.Status404NotFound)]
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[HttpGet]
+		public async Task<ActionResult<IReadOnlyList<Order>>> GetAllOrdersForUser()
+		{
+			var BuyerEmail = User.FindFirstValue(ClaimTypes.Email);
+			var Orders = await _orderService.GetOrdersForSpecificUserAsync(BuyerEmail);
+			if (Orders.Count <= 0) 
+				return NotFound(new ApiErrorResponse(404, "There is no Orders for this User"));
+
+			return Ok(Orders);
+		}
 	}
 }

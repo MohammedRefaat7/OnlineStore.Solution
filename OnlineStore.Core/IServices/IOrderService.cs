@@ -13,7 +13,7 @@ namespace OnlineStore.Core.IServices
 		Task<Order?> CreateOrderAsync(string BuyerEmail, string BasketId, int DeliveryMethodId, Address ShippingAddress);
 
 		// Get All Orders For Specific User
-		Task<IReadOnlyList<Order>> GetOrdersForSpecificUserAsync(string BuyerEmail);
+		Task<IReadOnlyList<Order?>> GetOrdersForSpecificUserAsync(string BuyerEmail);
 
 		// Get Order By ID For Specific User
 		Task<Order> GetOrderByIdForSpecificUserAsync(string BuyerEmail, int OrderId);
