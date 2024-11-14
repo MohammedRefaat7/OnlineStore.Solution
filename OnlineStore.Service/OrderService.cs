@@ -5,6 +5,7 @@ using OnlineStore.Core.IRepositories;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models;
 using OnlineStore.Core.Models.Order_Aggregate;
+using OnlineStore.Core.Specifications.OrderSpecs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,9 +71,12 @@ namespace OnlineStore.Service
 			throw new NotImplementedException();
 		}
 
-		public Task<IReadOnlyList<Order>> GetOrdersForSpecificUserAsync(string BuyerEmail)
+		public async Task<IReadOnlyList<Order>> GetOrdersForSpecificUserAsync(string BuyerEmail)
 		{
-			throw new NotImplementedException();
+			var Spec = new OrderSpecifications(BuyerEmail);
+
+			var Orders = await _unitOfWork.Repository<Order>().GetAllAsync(Spec);
+			return Orders;
 		}
 	}
 }
