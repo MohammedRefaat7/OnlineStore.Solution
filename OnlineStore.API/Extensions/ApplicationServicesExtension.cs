@@ -3,7 +3,9 @@ using OnlineStore.API.Errors;
 using OnlineStore.API.Helpers;
 using OnlineStore.Core;
 using OnlineStore.Core.IRepositories;
+using OnlineStore.Core.IServices;
 using OnlineStore.Repository;
+using OnlineStore.Service;
 
 namespace OnlineStore.API.Extensions
 {
@@ -21,6 +23,8 @@ namespace OnlineStore.API.Extensions
 			Services.AddAutoMapper(typeof(MappingProfiles));
 
 			Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+			Services.AddScoped<IOrderService, OrderService>();
 
 			#region Error Handling
 			Services.Configure<ApiBehaviorOptions>(Options =>
