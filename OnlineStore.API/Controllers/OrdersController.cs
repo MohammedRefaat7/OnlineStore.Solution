@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OnlineStore.API.DTOs;
 using OnlineStore.API.Errors;
+using OnlineStore.Core;
 using OnlineStore.Core.IServices;
 using OnlineStore.Core.Models.Order_Aggregate;
 using System.Security.Claims;
@@ -15,11 +17,13 @@ namespace OnlineStore.API.Controllers
 	{
 		private readonly IOrderService _orderService;
 		private readonly IMapper _mapper;
+		private readonly IUnitOfWork _unitOfWork;
 
-		public OrdersController(IOrderService OrderService, IMapper Mapper)
+		public OrdersController(IOrderService OrderService, IMapper Mapper , IUnitOfWork unitOfWork)
 		{
 			_orderService = OrderService;
 			_mapper = Mapper;
+			this._unitOfWork = unitOfWork;
 		}
 
 		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -62,6 +66,16 @@ namespace OnlineStore.API.Controllers
 
 			var MappedOrder = _mapper.Map<Order, OrderToReturnDto>(order);
 			return Ok(MappedOrder);
+		}
+
+		[HttpGet("DeliveryMethods")]
+		public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetAllDeliveryMethod()
+		{
+			var DeliveryMethods = await _unitOfWork.Repository<DeliveryMethod>().GetAllAsync();
+			if (DeliveryMethods is null) 
+				return NotFound(new ApiErrorResponse(404, "There is No Delivery Methods")); 
+
+			return Ok(DeliveryMethods);
 		}
 	}
 }
