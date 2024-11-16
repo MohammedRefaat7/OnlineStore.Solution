@@ -21,6 +21,16 @@ namespace OnlineStore.API.Helpers
             CreateMap<BasketItemDTO, BasketItem>();
 
             CreateMap<AddressDto, Core.Models.Order_Aggregate.Address>();
+
+            CreateMap<Order, OrderToReturnDto>()
+                .ForMember(d => d.DeliveryMethod, o => o.MapFrom(s => s.DeliveryMethod.ShortName))
+                .ForMember(d => d.DeliveryMethodCost, o => o.MapFrom(s => s.DeliveryMethod.Cost));
+
+            CreateMap<OrderItem, OrderItemDto>()
+                .ForMember(d => d.ProductId, o => o.MapFrom(s => s.Product.ProductId))
+                .ForMember(d => d.ProductName, o => o.MapFrom(S => S.Product.ProductName))
+                .ForMember(d => d.PicturUrl, o => o.MapFrom(s => s.Product.PicturUrl))
+                .ForMember(d => d.PicturUrl , o => o.MapFrom<OrderItemPictureUrlResolver>());
         }
     }
 }

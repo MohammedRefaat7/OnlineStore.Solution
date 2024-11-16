@@ -45,7 +45,8 @@ namespace OnlineStore.API.Controllers
 			if (Orders.Count <= 0)
 				return NotFound(new ApiErrorResponse(404, "There is no Orders for this User"));
 
-			return Ok(Orders);
+			var MappedOrders = _mapper.Map<IReadOnlyList<Order>, IReadOnlyList<OrderToReturnDto>>(Orders);
+			return Ok(MappedOrders);
 		}
 
 		[ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -58,7 +59,9 @@ namespace OnlineStore.API.Controllers
 			string BuyerEmail = User.FindFirstValue(ClaimTypes.Email);
 			var order = await _orderService.GetOrderByIdForSpecificUserAsync(BuyerEmail, id);
 			if (order is null) return NotFound(new ApiErrorResponse(404, $"Order with ID {id} not found for this User."));
-			return Ok(order);
+
+			var MappedOrder = _mapper.Map<Order, OrderToReturnDto>(order);
+			return Ok(MappedOrder);
 		}
 	}
 }
