@@ -26,6 +26,8 @@ namespace OnlineStore.API.Extensions
 
 			Services.AddScoped<IOrderService, OrderService>();
 
+			Services.AddScoped<IPaymentService, PaymentService>();
+
 			#region Error Handling
 			Services.Configure<ApiBehaviorOptions>(Options =>
 			{
