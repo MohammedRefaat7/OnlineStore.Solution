@@ -11,6 +11,10 @@ namespace OnlineStore.Core.Models
 		public string Id { get; set; }
 		public List<BasketItem> Items { get; set; }
 
+        public string? PaymentIntentId { get; set; }
+        public string? ClientSecret { get; set; }
+        public int? DeliveryMethodId { get; set; }
+
         public CustomerBasket(string id)
         {
             Id = id;
