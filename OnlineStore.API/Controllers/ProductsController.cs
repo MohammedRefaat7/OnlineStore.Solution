@@ -55,7 +55,7 @@ namespace OnlineStore.API.Controllers
 		public async Task<ActionResult<Product>> GetProduct(int id)
 		{
 			var specs = new ProductWithTypeAndBrandSpecs(id);
-			var Product = await _ProductRepo.GetByIdAsync(specs);
+			var Product = await _ProductRepo.GetEntityWithSpecAsync(specs);
 			if (Product is null) return NotFound(new ApiErrorResponse(404));
 
 			//Mapping

@@ -39,7 +39,7 @@ namespace OnlineStore.Repository
 			return await ApplySpecification(Specs).ToListAsync();
 		}
 
-		public async Task<T> GetByIdAsync(ISpecification<T> Specs)
+		public async Task<T> GetEntityWithSpecAsync(ISpecification<T> Specs)
 		{
 			return await ApplySpecification(Specs).FirstOrDefaultAsync();
 		}
